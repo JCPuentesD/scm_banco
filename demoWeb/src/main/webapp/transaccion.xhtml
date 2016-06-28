@@ -1,0 +1,96 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>	
+
+</h:head>
+
+<h:body>
+
+	<h:form>
+		<p:growl id="msg"/>
+		<p:panel header="Formulario de Transacciones" id="pnlFormularioTransaccion">
+			<h:panelGrid columns="2" border="0">
+				<p:outputLabel value="Número de Cuenta" />
+				<p:inputText id="txtCueNumero" binding="#{transaccionVista.txtCueNumero}">
+					<p:ajax listener="#{transaccionVista.txtCueNumeroListener}" update="msg,pnlFormularioTransaccion" />
+				</p:inputText>
+				
+				<p:outputLabel value="Nombre Cliente" />
+				<p:inputText id="txtCliNombre" binding="#{transaccionVista.txtCliNombre}" disabled="true" />
+					
+				<p:outputLabel value="Usuario" />
+				<p:selectOneMenu id="somUsuario" binding="#{transaccionVista.somUsuario}">
+					<f:selectItem itemValue="-1" itemLabel="-SELECCIONE-" />
+					<f:selectItems value="#{transaccionVista.losUsuariosItems}" />
+				</p:selectOneMenu>
+				
+				<p:outputLabel value="Valor" />
+				<p:inputText id="txtValor" binding="#{transaccionVista.txtValor}" />
+			</h:panelGrid>
+			
+			<br/>
+			
+			<h:panelGrid columns="3" border="0">
+				<p:commandButton id="btnConsignar" value="Consignar" update="pnlFormularioTransaccion,msg,pnlConsignar,pnlRetiro"    disabled="true"   binding="#{transaccionVista.btnConsignar}" action="#{transaccionVista.consignarAction}" onclick="PF('pnlRetiro').close();PF('pnlConsignar').show();" />
+				<p:commandButton id="btnRetirar"   value="Retirar"   update="pnlFormularioTransaccion,msg,pnlConsignar,pnlRetiro"    disabled="true"   binding="#{transaccionVista.btnRetirar}"   action="#{transaccionVista.retirarAction}"   onclick="PF('pnlConsignar').close();PF('pnlRetiro').show();" />
+				<p:commandButton id="btnLimpiar"   value="Limpiar"	 update="pnlFormularioTransaccion"	                                               binding="#{transaccionVista.btnLimpiar}"   action="#{transaccionVista.limpiarAction}" />
+			</h:panelGrid>
+				
+		</p:panel>
+		
+		<p:panel id="pnlConsignar" widgetVar="pnlConsignar" closable="true" toggleable="true" visible="true">
+			<p:dataTable id="dtConsignar" var="consignar" value="#{transaccionVista.lasConsignaciones}" paginator="true" rows="5" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15,20" >
+
+				<p:column headerText="Código" filterBy="#{consignar.id.conCodigo}">
+					<p:outputLabel value="#{consignar.id.conCodigo}" />
+				</p:column>
+				<p:column headerText="Número Cuenta" filterBy="#{consignar.id.cueNumero}">
+					<p:outputLabel value="#{consignar.id.cueNumero}" />
+				</p:column>
+				<p:column headerText="Cedula Usuario" filterBy="#{consignar.usuarios.usuCedula}">
+					<p:outputLabel value="#{consignar.usuarios.usuCedula}" />
+				</p:column>
+				<p:column headerText="Valor Consignación" filterBy="#{consignar.conValor}">
+					<p:outputLabel value="#{consignar.conValor}" />
+				</p:column>
+				<p:column headerText="Fecha Consignación" filterBy="#{consignar.conFecha}">
+					<p:outputLabel value="#{consignar.conFecha}" />
+				</p:column>
+				<p:column headerText="Descripción" filterBy="#{consignar.conDescripcion}">
+					<p:outputLabel value="#{consignar.conDescripcion}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>	
+		
+		<p:panel id="pnlRetiro" widgetVar="pnlRetiro" closable="true" toggleable="true" visible="false">
+			<p:dataTable id="dtRetiro" var="retiro" value="#{transaccionVista.losRetiros}" paginator="true" rows="5" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15,20" >
+
+				<p:column headerText="Código" filterBy="#{retiro.id.retCodigo}">
+					<p:outputLabel value="#{retiro.id.retCodigo}" />
+				</p:column>
+				<p:column headerText="Número Cuenta" filterBy="#{retiro.id.cueNumero}">
+					<p:outputLabel value="#{retiro.id.cueNumero}" />
+				</p:column>
+				<p:column headerText="Cedula Usuario" filterBy="#{retiro.usuarios.usuCedula}">
+					<p:outputLabel value="#{retiro.usuarios.usuCedula}" />
+				</p:column>
+				<p:column headerText="Valor Retiro" filterBy="#{retiro.retValor}">
+					<p:outputLabel value="#{retiro.retValor}" />
+				</p:column>
+				<p:column headerText="Fecha Retiro" filterBy="#{retiro.retFecha}">
+					<p:outputLabel value="#{retiro.retFecha}" />
+				</p:column>
+				<p:column headerText="Descripción" filterBy="#{retiro.retDescripcion}">
+					<p:outputLabel value="#{retiro.retDescripcion}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+		
+	</h:form>
+</h:body>
+</html>

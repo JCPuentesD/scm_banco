@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+</h:head>
+
+<h:body>
+
+	<h:form>
+		<p:growl id="msg"/>
+		<p:panel header="Formulario de usuario" id="pnlFormularioUsuario">
+			<h:panelGrid columns="2" border="0">
+				<p:outputLabel value="Cedula" />
+				<p:inputText id="txtUsuCedula" binding="#{usuarioVista.txtUsuCedula}">
+					<p:ajax listener="#{usuarioVista.txtUsuCedulaListener}" update="pnlFormularioUsuario" />
+				</p:inputText>
+
+				<p:outputLabel value="Tipo Usuario" />
+				<p:selectOneMenu id="somTipoUsuario" binding="#{usuarioVista.somTipoUsuario}">
+					<f:selectItem itemValue="-1" itemLabel="-SELECCIONE-" />
+					<f:selectItems value="#{usuarioVista.losTiposUsuarioItems}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Nombre" />
+				<p:inputText id="txtUsuNombre" binding="#{usuarioVista.txtUsuNombre}" />
+
+				<p:outputLabel value="Login" />
+				<p:inputText id="txtUsuLogin" binding="#{usuarioVista.txtUsuLogin}" />
+
+				<p:outputLabel value="Clave" />
+				<p:inputText id="txtUsuClave" binding="#{usuarioVista.txtUsuClave}" />
+
+			</h:panelGrid>
+			<h:panelGrid columns="4" border="0">
+				<p:commandButton id="btnCrear"     value="Crear" 	  update="msg,pnlFormularioUsuario"   binding="#{usuarioVista.btnCrear}" 	disabled="true"  action="#{usuarioVista.crearAction}" />
+				<p:commandButton id="btnModificar" value="Modificar"  update="msg,pnlFormularioUsuario"	 binding="#{usuarioVista.btnModificar}" disabled="true"  action="#{usuarioVista.modificarAction}" />
+				<p:commandButton id="btnBorrar"    value="Borrar"  	  update="msg,pnlFormularioUsuario"	 binding="#{usuarioVista.btnBorrar}" 	disabled="true"  action="#{usuarioVista.borrarAction}" />
+				<p:commandButton id="btnLimpiar"   value="Limpiar"	  update="msg,pnlFormularioUsuario"	 binding="#{usuarioVista.btnLimpiar}" 	disabled="false" action="#{usuarioVista.limpiarAction}" />
+			</h:panelGrid>
+		</p:panel>
+	</h:form>
+</h:body>
+</html>
