@@ -3,8 +3,6 @@ package co.edu.usbcali.demo.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.faces.model.SelectItem;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +14,6 @@ import co.edu.usbcali.demo.delegado.IDelegadoDeNegocio;
 import co.edu.usbcali.demo.dto.ClienteDTO;
 import co.edu.usbcali.demo.modelo.Clientes;
 import co.edu.usbcali.demo.modelo.TiposDocumentos;
-import co.edu.usbcali.demo.modelo.Usuarios;
 
 @RestController
 @RequestMapping("/cliente")
