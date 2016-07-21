@@ -31,8 +31,8 @@ public class TransaccionLogica implements ITransaccionLogica {
 	private Logger log = LoggerFactory.getLogger(TransaccionLogica.class);
 	private long conCodigo = 0;
 	private long retCodigo = 0;
-	private String cqurl = "https://sqs.us-west-2.amazonaws.com/929453850538/consignaciones";
-	private String rqurl = "https://sqs.us-west-2.amazonaws.com/929453850538/retiros";
+	private String qurl = null;
+	private String nombreCola = null;
 	private String mensaje;
 	private String strNombreTabla = "tbl_transacciones";
 
@@ -78,7 +78,7 @@ public class TransaccionLogica implements ITransaccionLogica {
 		}
 
 		if (cuentas.getClientes().getCliId() == clientes.getCliId()) {
-
+			
 			Usuarios usuarios = usuarioLogica.consultarUsuariosPorId(usuCedula);
 
 			if (usuarios == null) {
@@ -114,13 +114,26 @@ public class TransaccionLogica implements ITransaccionLogica {
 			cuentaLogica.modificar(cuentas);
 			log.info("cuenta acredita exitosamente.\n");
 
-			// armar mensaje --> ej:
 			// consignacionesId:1,cueNumero:4008-5305-0010,conValor:100000.00,concepto:consignacion
 			mensaje = consignaciones.getId().getConCodigo() + "," + consignaciones.getId().getCueNumero() + ","
 					+ consignaciones.getConValor() + ",consignacion";
+			
+			nombreCola = "consignaciones";
+			qurl = null;
+			// obtener url
+			qurl = colaSimpleLogica.consultarUrlCola(nombreCola);
+			log.info("qurl consignaciones: " + qurl);
+			
+			if(qurl==null) {
+				// crear cola en aws
+				colaSimpleLogica.crearColaSQS(nombreCola);
+				log.warn("Cola {} creada con exito.\n", nombreCola);
+				// obtener url
+				qurl = colaSimpleLogica.consultarUrlCola(nombreCola);
+			} 
 
 			// enviar consignación a la cola aws
-			colaSimpleLogica.enviarMensaje(mensaje, cqurl);
+			colaSimpleLogica.enviarMensaje(mensaje, qurl);
 			log.info("Mensaje de consignación enviado: " + mensaje + "\n");
 
 			// crear tabla dynamodb
@@ -130,7 +143,7 @@ public class TransaccionLogica implements ITransaccionLogica {
 			List<Message> messages = null;
 
 			// Receive messages
-			while ((messages = colaSimpleLogica.recibirMensajes(cqurl)).size() > 0) {
+			while ((messages = colaSimpleLogica.recibirMensajes(qurl)).size() > 0) {
 
 				for (Message message : messages) {
 					log.info("  Message");
@@ -143,7 +156,7 @@ public class TransaccionLogica implements ITransaccionLogica {
 					awsDynamoDB.adicionarRegistro(strNombreTabla, message.getBody());
 
 					// Delete a message
-					colaSimpleLogica.eliminarMensaje(message, cqurl);
+					colaSimpleLogica.eliminarMensaje(message, qurl);
 					log.info("Mensaje eliminado.\n");
 				}
 			}
@@ -214,14 +227,27 @@ public class TransaccionLogica implements ITransaccionLogica {
 
 			retiroLogica.grabar(retiros);
 			log.info("retiro exitoso.\n");
-
-			// armar mensaje --> ej:
+			
 			// retirosId:1,cueNumero:4008-5305-0010,retValor:100000.00,concepto:retiro
 			mensaje = retiros.getId().getRetCodigo() + "," + retiros.getId().getCueNumero() + ","
-					+ retiros.getRetValor() + ",retiro";			
+					+ retiros.getRetValor() + ",retiro";
+			
+			nombreCola = "retiros";
+			qurl = null;
+			// obtener url
+			qurl = colaSimpleLogica.consultarUrlCola(nombreCola);
+			log.info("qurl retiros: " + qurl);
+			
+			if(qurl==null) {
+				// crear cola en aws
+				colaSimpleLogica.crearColaSQS(nombreCola);
+				log.warn("Cola {} creada con exito.\n", nombreCola);
+				// obtener url
+				qurl = colaSimpleLogica.consultarUrlCola(nombreCola);
+			} 
 
 			// enviar retiro a la cola aws
-			colaSimpleLogica.enviarMensaje(mensaje, rqurl);
+			colaSimpleLogica.enviarMensaje(mensaje, qurl);
 			log.info("Mensaje de retiro enviado: " + mensaje + "\n");
 
 			// crear tabla dynamodb
@@ -231,7 +257,7 @@ public class TransaccionLogica implements ITransaccionLogica {
 			List<Message> messages = null;
 
 			// Receive messages
-			while ((messages = colaSimpleLogica.recibirMensajes(rqurl)).size() > 0) {
+			while ((messages = colaSimpleLogica.recibirMensajes(qurl)).size() > 0) {
 
 				for (Message message : messages) {
 					log.info("  Message");
@@ -244,7 +270,7 @@ public class TransaccionLogica implements ITransaccionLogica {
 					awsDynamoDB.adicionarRegistro(strNombreTabla, message.getBody());
 
 					// Delete a message
-					colaSimpleLogica.eliminarMensaje(message, rqurl);
+					colaSimpleLogica.eliminarMensaje(message, qurl);
 					log.info("Mensaje eliminado.\n");
 				}
 			}
